@@ -62,11 +62,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 		return -1;
 	else
 		return msg.wParam;
-
+	
 	return 0;
-}
-
-void test(int a)
-{
-
 }
