@@ -1,7 +1,6 @@
 #include <Windows.h>
 
-#define log(x) std::cout << x << std::endl
-
+//#define log(x) std::cout << x << std::endl
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -10,6 +9,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE : 
 		PostQuitMessage(0);
 		break;
+	case WM_KEYDOWN:
+		if (wParam == 'F')
+		{
+			SetWindowText(hWnd, "f");
+		}
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
