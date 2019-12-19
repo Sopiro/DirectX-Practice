@@ -32,5 +32,18 @@
     <ClInclude Include="MyException.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Practice.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="joystick.ico">
+      <Filter>res</Filter>
+    </Image>
   </ItemGroup>
 </Project>

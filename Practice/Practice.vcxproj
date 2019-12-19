@@ -165,7 +165,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyException.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Practice.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="joystick.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
