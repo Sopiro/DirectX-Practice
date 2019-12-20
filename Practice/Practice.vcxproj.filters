@@ -27,6 +27,9 @@
     <ClCompile Include="Keyboard.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="Mouse.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -39,6 +42,9 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="Keyboard.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Mouse.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,10 +3,10 @@
 #include <Windows.h>
 #include "MyException.h"
 #include "Keyboard.h"
+#include "Mouse.h"
 
 class Window
 {
-private:
 public:
 	class Exception : public MyException
 	{
@@ -20,6 +20,8 @@ public:
 	private:
 		HRESULT hr;
 	};
+private:
+	// singleton manages registration/cleanup of window class
 	class WindowClass
 	{
 	public:
@@ -29,22 +31,24 @@ public:
 		WindowClass() noexcept;
 		~WindowClass();
 		WindowClass(const WindowClass&) = delete;
-		WindowClass& operator = (const WindowClass&) = delete;
+		WindowClass& operator=(const WindowClass&) = delete;
 		static constexpr const char* wndClassName = "Window";
 		static WindowClass wndClass;
 		HINSTANCE hInst;
 	};
 public:
-	Window(int width, int height, const char* name) noexcept;
+	Window(int width, int height, const char* name);
 	~Window();
 	Window(const Window&) = delete;
-	Window& operator = (const Window&) = delete;
+	Window& operator=(const Window&) = delete;
+	void SetTitle(const std::string& title);
 private:
-	static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	static LRESULT WINAPI HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 public:
 	Keyboard kbd;
+	Mouse mouse;
 private:
 	int width;
 	int height;

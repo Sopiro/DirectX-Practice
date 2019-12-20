@@ -107,4 +107,3 @@ void Keyboard::TrimBuffer(std::queue<T>& buffer) noexcept
 		buffer.pop();
 	}
 }
-

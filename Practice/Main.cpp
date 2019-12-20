@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <string>
+#include <sstream>
 #include "Window.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow)
@@ -17,8 +18,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 
-			if (wnd.kbd.KeyIsPressed(VK_MENU))
-				MessageBox(nullptr, "Asdasd", "asdad", 0);
+			while (!wnd.mouse.IsEmpty())
+			{
+				const auto e = wnd.mouse.Read();
+				if (e.GetType() == Mouse::Event::Type::Move)
+				{
+					std::ostringstream oss;
+					oss << e.GetPosX() << ", " << e.GetPosY();
+					wnd.SetTitle(oss.str());
+				}
+			}
 		}
 
 		if (gResult == -1)
