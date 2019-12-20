@@ -16,13 +16,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+
+			if (wnd.kbd.KeyIsPressed(VK_MENU))
+				MessageBox(nullptr, "Asdasd", "asdad", 0);
 		}
 
 		if (gResult == -1)
 			return -1;
 		else
 			return msg.wParam;
-
 	}
 	catch (const MyException & e)
 	{

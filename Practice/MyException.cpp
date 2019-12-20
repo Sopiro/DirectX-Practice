@@ -4,7 +4,6 @@
 MyException::MyException(int line, const char* file) noexcept
 	:line(line), file(file)
 {
-
 }
 
 const char* MyException::what() const noexcept

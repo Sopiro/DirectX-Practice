@@ -106,6 +106,25 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	case WM_CLOSE:
 		PostQuitMessage(0);
 		return 0;
+
+		//clear keystate when window loses focus to prevent input getting "stuck"
+	case WM_KILLFOCUS:
+		kbd.ClearState();
+		break;
+
+		//Keyboard messages
+	case WM_KEYDOWN:
+	case WM_SYSKEYDOWN:
+		if (!(lParam & 0x40000000) || kbd.AutorepeatIsEnabled())
+			kbd.OnKeyPressed(static_cast<unsigned char>(wParam));
+		break;
+	case WM_KEYUP:
+	case WM_SYSKEYUP:
+		kbd.OnKeyReleased(static_cast<unsigned char>(wParam));
+		break;
+	case WM_CHAR:
+		kbd.OnChar(static_cast<unsigned char>(wParam));
+		break;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
@@ -160,4 +179,3 @@ std::string Window::Exception::GetErrorString() const noexcept
 {
 	return TranslateErrorCode(hr);
 }
-

@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include "MyException.h"
+#include "Keyboard.h"
 
 class Window
 {
@@ -42,6 +43,8 @@ private:
 	static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT WINAPI HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+public:
+	Keyboard kbd;
 private:
 	int width;
 	int height;
