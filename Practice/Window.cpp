@@ -168,9 +168,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		else
 		{
 			if (wParam & (MK_LBUTTON | MK_RBUTTON))
-			{
 				mouse.OnMouseMove(pt.x, pt.y);
-			}
 			// button up -> release capture / log event for leaving
 			else
 			{
@@ -270,4 +268,26 @@ HRESULT Window::Exception::GetErrorCode() const noexcept
 std::string Window::Exception::GetErrorString() const noexcept
 {
 	return TranslateErrorCode(hr);
+}
+
+std::optional<int> Window::ProcessMessages()
+{
+	MSG msg;
+	// while queue has messages, remove and dispatch them (but do not block on empty queue)
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		// check for quit because peekmessage does not signal this via return val
+		if (msg.message == WM_QUIT)
+		{
+			// return optional wrapping int (arg to PostQuitMessage is in wparam) signals quit
+			return msg.wParam;
+		}
+
+		// TranslateMessage will post auxilliary WM_CHAR messages from key msgs
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	// return empty optional when not quitting app
+	return {};
 }

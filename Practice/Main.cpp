@@ -1,39 +1,11 @@
-#include <Windows.h>
 #include <string>
-#include <sstream>
-#include "Window.h"
+#include "App.h"
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow)
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	try
 	{
-		Window wnd(640, 480, "Test");
-
-		// Run the message loop.
-		MSG msg;
-		BOOL gResult;
-
-		while (gResult = (GetMessage(&msg, nullptr, 0, 0)) > 0)
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-
-			while (!wnd.mouse.IsEmpty())
-			{
-				const auto e = wnd.mouse.Read();
-				if (e.GetType() == Mouse::Event::Type::Move)
-				{
-					std::ostringstream oss;
-					oss << e.GetPosX() << ", " << e.GetPosY();
-					wnd.SetTitle(oss.str());
-				}
-			}
-		}
-
-		if (gResult == -1)
-			return -1;
-		else
-			return msg.wParam;
+		return Game{}.Start();
 	}
 	catch (const MyException & e)
 	{
