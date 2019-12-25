@@ -13,6 +13,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Dxerr">
+      <UniqueIdentifier>{f3de8bcb-657b-4d61-8944-04b44c6200f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -38,6 +41,12 @@
     </ClCompile>
     <ClCompile Include="Graphics.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="Dxerr.cpp">
+      <Filter>Dxerr</Filter>
+    </ClCompile>
+    <ClCompile Include="DxgiInfoManager.cpp">
+      <Filter>Dxerr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +77,12 @@
     <ClInclude Include="WinHeader.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="Dxerr.h">
+      <Filter>Dxerr</Filter>
+    </ClInclude>
+    <ClInclude Include="DxgiInfoManager.h">
+      <Filter>Dxerr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Practice.rc">
@@ -78,5 +93,16 @@
     <Image Include="joystick.ico">
       <Filter>res</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\hw3d\hw3d\DXTrace.inl">
+      <Filter>Dxerr</Filter>
+    </None>
+    <None Include="..\..\hw3d\hw3d\DXGetErrorDescription.inl">
+      <Filter>Dxerr</Filter>
+    </None>
+    <None Include="..\..\hw3d\hw3d\DXGetErrorString.inl">
+      <Filter>Dxerr</Filter>
+    </None>
   </ItemGroup>
 </Project>

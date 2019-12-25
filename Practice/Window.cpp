@@ -18,17 +18,16 @@ Window::WindowClass::WindowClass() noexcept
 	wc.hInstance = GetInstance();
 	wc.hIcon = static_cast<HICON>(LoadImage(
 		GetInstance(), MAKEINTRESOURCE(IDI_ICON1),
-		IMAGE_ICON, 256, 256, 0
-	));
-	wc.hIconSm = static_cast<HICON>(LoadImage(
-		GetInstance(), MAKEINTRESOURCE(IDI_ICON1),
-		IMAGE_ICON, 16, 16, 0
+		IMAGE_ICON, 32, 32, 0
 	));
 	wc.hCursor = nullptr;
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = GetName();
-
+	wc.hIconSm = static_cast<HICON>(LoadImage(
+		GetInstance(), MAKEINTRESOURCE(IDI_ICON1),
+		IMAGE_ICON, 16, 16, 0
+	));
 	RegisterClassEx(&wc);
 }
 
@@ -47,9 +46,11 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 	return wndClass.hInst;
 }
 
+
 // Window Stuff
 Window::Window(int width, int height, const char* name)
-	:width(width),
+	:
+	width(width),
 	height(height)
 {
 	// calculate window size based on desired client region size
@@ -60,7 +61,7 @@ Window::Window(int width, int height, const char* name)
 	wr.bottom = height + wr.top;
 	if (AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
 	{
-		throw MYWND_EXCEPT_LAST();
+		throw CHWND_LAST_EXCEPT();
 	}
 	// create window & get hWnd
 	hWnd = CreateWindow(
@@ -72,11 +73,11 @@ Window::Window(int width, int height, const char* name)
 	// check for error
 	if (hWnd == nullptr)
 	{
-		throw MYWND_EXCEPT_LAST();
+		throw CHWND_LAST_EXCEPT();
 	}
-	// show window
+	// newly created windows start off as hidden
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
-
+	// create graphics object
 	pGfx = std::make_unique<Graphics>(hWnd);
 }
 
@@ -89,8 +90,39 @@ void Window::SetTitle(const std::string& title)
 {
 	if (SetWindowText(hWnd, title.c_str()) == 0)
 	{
-		throw MYWND_EXCEPT_LAST();
+		throw CHWND_LAST_EXCEPT();
 	}
+}
+
+std::optional<int> Window::ProcessMessages() noexcept
+{
+	MSG msg;
+	// while queue has messages, remove and dispatch them (but do not block on empty queue)
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		// check for quit because peekmessage does not signal this via return val
+		if (msg.message == WM_QUIT)
+		{
+			// return optional wrapping int (arg to PostQuitMessage is in wparam) signals quit
+			return (int)msg.wParam;
+		}
+
+		// TranslateMessage will post auxilliary WM_CHAR messages from key msgs
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	// return empty optional when not quitting app
+	return {};
+}
+
+Graphics& Window::Gfx()
+{
+	if (!pGfx)
+	{
+		throw CHWND_NOGFX_EXCEPT();
+	}
+	return *pGfx;
 }
 
 LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -170,7 +202,9 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		else
 		{
 			if (wParam & (MK_LBUTTON | MK_RBUTTON))
+			{
 				mouse.OnMouseMove(pt.x, pt.y);
+			}
 			// button up -> release capture / log event for leaving
 			else
 			{
@@ -196,12 +230,24 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnLeftReleased(pt.x, pt.y);
+		// release mouse if outside of window
+		if (pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height)
+		{
+			ReleaseCapture();
+			mouse.OnMouseLeave();
+		}
 		break;
 	}
 	case WM_RBUTTONUP:
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnRightReleased(pt.x, pt.y);
+		// release mouse if outside of window
+		if (pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height)
+		{
+			ReleaseCapture();
+			mouse.OnMouseLeave();
+		}
 		break;
 	}
 	case WM_MOUSEWHEEL:
@@ -217,34 +263,13 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
+
 // Window Exception Stuff
-Window::Exception::Exception(int line, const char* file, HRESULT hr) noexcept
-	:
-	MyException(line, file),
-	hr(hr)
-{}
-
-const char* Window::Exception::what() const noexcept
-{
-	std::ostringstream oss;
-	oss << GetType() << std::endl
-		<< "[Error Code] " << GetErrorCode() << std::endl
-		<< "[Description] " << GetErrorString() << std::endl
-		<< GetOriginString();
-	whatBuffer = oss.str();
-	return whatBuffer.c_str();
-}
-
-const char* Window::Exception::GetType() const noexcept
-{
-	return "My Window Exception";
-}
-
 std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
 {
 	char* pMsgBuf = nullptr;
 	// windows will allocate memory for err string and make our pointer point to it
-	DWORD nMsgLen = FormatMessage(
+	const DWORD nMsgLen = FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -262,39 +287,42 @@ std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
 	return errorString;
 }
 
-HRESULT Window::Exception::GetErrorCode() const noexcept
+
+Window::HrException::HrException(int line, const char* file, HRESULT hr) noexcept
+	:
+	Exception(line, file),
+	hr(hr)
+{}
+
+const char* Window::HrException::what() const noexcept
+{
+	std::ostringstream oss;
+	oss << GetType() << std::endl
+		<< "[Error Code] 0x" << std::hex << std::uppercase << GetErrorCode()
+		<< std::dec << " (" << (unsigned long)GetErrorCode() << ")" << std::endl
+		<< "[Description] " << GetErrorDescription() << std::endl
+		<< GetOriginString();
+	whatBuffer = oss.str();
+	return whatBuffer.c_str();
+}
+
+const char* Window::HrException::GetType() const noexcept
+{
+	return "Window Exception";
+}
+
+HRESULT Window::HrException::GetErrorCode() const noexcept
 {
 	return hr;
 }
 
-std::string Window::Exception::GetErrorString() const noexcept
+std::string Window::HrException::GetErrorDescription() const noexcept
 {
-	return TranslateErrorCode(hr);
+	return Exception::TranslateErrorCode(hr);
 }
 
-std::optional<int> Window::ProcessMessages()
+
+const char* Window::NoGfxException::GetType() const noexcept
 {
-	MSG msg;
-	// while queue has messages, remove and dispatch them (but do not block on empty queue)
-	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-	{
-		// check for quit because peekmessage does not signal this via return val
-		if (msg.message == WM_QUIT)
-		{
-			// return optional wrapping int (arg to PostQuitMessage is in wparam) signals quit
-			return msg.wParam;
-		}
-
-		// TranslateMessage will post auxilliary WM_CHAR messages from key msgs
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-
-	// return empty optional when not quitting app
-	return {};
-}
-
-Graphics& Window::Gfx()
-{
-	return *pGfx;
+	return "Window Exception [No Graphics]";
 }
