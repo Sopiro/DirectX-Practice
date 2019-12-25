@@ -24,8 +24,9 @@ int Game::Start()
 
 void Game::DoFrame()
 {
-	const float t = timer.Peek();
-	std::ostringstream oss;
-	oss << "Time elapsed: " << std::setprecision(1) << std::fixed << t << "s";
-	wnd.SetTitle(oss.str());
+	Graphics& gfx = wnd.Gfx();
+
+	gfx.ClearBuffer(1, 0, 1);
+
+	gfx.EndFrame();
 }
