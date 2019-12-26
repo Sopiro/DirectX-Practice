@@ -27,6 +27,6 @@ void Game::DoFrame()
 	Graphics& gfx = wnd.Gfx();
 
 	gfx.ClearBuffer(1, 0, 1);
-
+	wnd.Gfx().DrawTestTriangle();
 	gfx.EndFrame();
 }
