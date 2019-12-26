@@ -4,7 +4,7 @@
 
 Game::Game()
 	:
-	wnd(800, 600, "Test")
+	wnd(800, 600, "D3D exploration")
 {
 }
 
