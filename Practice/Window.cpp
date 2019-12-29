@@ -10,7 +10,7 @@ Window::WindowClass::WindowClass() noexcept
 	hInst(GetModuleHandle(nullptr))
 {
 	WNDCLASSEX wc = { 0 };
-	wc.cbSize = sizeof(wc);
+	wc.cbSize = sizeof(wc); 
 	wc.style = CS_OWNDC;
 	wc.lpfnWndProc = HandleMsgSetup;
 	wc.cbClsExtra = 0;
@@ -45,7 +45,6 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 {
 	return wndClass.hInst;
 }
-
 
 // Window Stuff
 Window::Window(int width, int height, const char* name)

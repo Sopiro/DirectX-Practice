@@ -146,7 +146,6 @@ void Graphics::DrawTestTriangle()
 	const UINT offset = 0u;
 	pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
 
-
 	// create index buffer
 	const unsigned short indices[] =
 	{
@@ -172,8 +171,8 @@ void Graphics::DrawTestTriangle()
 
 
 	// create pixel shader
-	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
 	wrl::ComPtr<ID3DBlob> pBlob;
+	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
 	GFX_THROW_INFO(D3DReadFileToBlob(L"PixelShader.cso", &pBlob));
 	GFX_THROW_INFO(pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader));
 
@@ -191,6 +190,7 @@ void Graphics::DrawTestTriangle()
 
 
 	// input (vertex) layout (2d position only)
+	// In openGL it means like glBindAttribLocation()
 	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
