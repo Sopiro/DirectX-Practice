@@ -27,6 +27,10 @@ void Game::DoFrame()
 	Graphics& gfx = wnd.Gfx();
 
 	gfx.ClearBuffer(1, 0, 1);
-	wnd.Gfx().DrawTestTriangle();
+	gfx.DrawTestTriangle(
+		timer.Peek(),
+		wnd.mouse.GetPosX() / 400.0f - 1.0f,
+		-wnd.mouse.GetPosY() / 300.0f + 1.0f
+	);
 	gfx.EndFrame();
 }
